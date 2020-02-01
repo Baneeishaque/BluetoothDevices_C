@@ -1,4 +1,4 @@
-/*Contact Management Database using a dynamic - single linked list*/
+/*Bluetooth Device Management Database using a dynamic - single linked list*/
 
 /* Define libraries to be included */
 #include <stdio.h>
@@ -9,40 +9,37 @@
 /* Define Functions*/
 void clearInput(void);
 
-void addNewContact(void);
+void addNewDevice(void);
 
-void listAll(void);
+void listAllDevices(void);
 
-void deleteContact(void);
+void deleteDevice(void);
 
-void modifyContact(void);
+void modifyDevice(void);
 
-int findContact(void);
+int findDevice(void);
 
 int prompt(void);
 
-int findnum(int);
+int checkDevice(int);
 
 /* Define Structures*/
-typedef struct contact {
-    int number;        /*unique account number*/
-    char name[20];     /*contains name*/
-    char phone[15];    /*contains phone number*/
-    char email[20];           /*contains email address*/
-    struct contact *next; /*next is used to navigate through structures.*/
-    int count;     /*count is used to input comments into array*/
-} Contact;
+typedef struct bluetoothDevice {
+    int serialNumber;        /*unique account serial Number*/
+    char deviceName[20];     /*contains device Name*/
+    struct bluetoothDevice *next; /*next is used to navigate through structures.*/
+} BluetoothDevice;
 
-Contact *firstRecord, *currentRecord, *newRecord; /*pointers*/
+BluetoothDevice *firstRecord, *currentRecord, *newRecord; /*pointers*/
 /* firstRecord is used to point to first record in list, currentRecord points to current record in list, newRecord contains address of new structure/node */
 
-int currentRecordNumber = 0; /*gives unique account numbers*/
+int currentRecordNumber = 0; /*gives unique serial numbers*/
 
 /* Main Function */
 int main() {
 
     FILE *datafile;
-    char *filename = "contactDatabase.dat";/*declare file name*/
+    char *filename = "bluetoothDeviceDatabase.dat";/*declare file devices*/
     char ch;
     firstRecord = NULL;
 
@@ -50,32 +47,31 @@ int main() {
 
     if (datafile) {
 
-        firstRecord = (struct contact *) malloc(sizeof(struct contact));
-        /*use of malloc to set aside memory relative to size of structure contact*/
+        firstRecord = (struct bluetoothDevice *) malloc(sizeof(struct bluetoothDevice));
+        /*use of malloc to set aside memory relative to size of structure bluetoothDevice*/
         currentRecord = firstRecord;       /*make first record current*/
         while (1) /*endless while loop. a NULL pointer in final node ends loop*/
         {
-            newRecord = (struct contact *) malloc(sizeof(struct contact));
-            fread(currentRecord, sizeof(struct contact), 1, datafile);
+            newRecord = (struct bluetoothDevice *) malloc(sizeof(struct bluetoothDevice));
+            fread(currentRecord, sizeof(struct bluetoothDevice), 1, datafile);
             if (currentRecord->next == NULL)   /* NULL indicates end of node list*/
                 break;
             currentRecord->next = newRecord;       /* pointer referencing next node*/
-            currentRecord->count = 0;           /* initiates count for comments*/
             currentRecord = newRecord;             /* make current record new*/
         }
         fclose(datafile);                /* close file - good practice to cloe files after use*/
-        currentRecordNumber = currentRecord->number;
+        currentRecordNumber = currentRecord->serialNumber;
     }
 
     do {
         fflush(stdin);
-        puts("\nWelcome To The Contact Database");/* print menu messages*/
+        puts("\nWelcome To The Bluetooth Device Database");/* print menu messages*/
         puts("-- -----------------------------");
-        puts("1 - Add a new contact");
-        puts("2 - Delete contact");
-        puts("3 - List all contacts");
-        puts("4 - Modify contact");
-        puts("5 - Find a contact by name");
+        puts("1 - Add a new bluetooth Device");
+        puts("2 - Delete bluetooth Device");
+        puts("3 - List all bluetooth Devices");
+        puts("4 - Modify bluetooth Device");
+        puts("5 - Find a bluetooth Device by deviceName");
         puts("-- -----------------------------");
         puts("Q - Save and quit\n");
         printf("\tYour choice:");
@@ -84,25 +80,25 @@ int main() {
         switch (ch)     /*stores in ch variable.*/
         {
             case '1':
-                puts("Add a new contact\n");
+                puts("Add a new bluetooth Device\n");
                 fflush(stdin);
-                addNewContact();//call addNewContact function
+                addNewDevice();//call addNewDevice function
                 break;
             case '2':
-                puts("Delete a contact\n");
-                deleteContact();
+                puts("Delete a bluetooth Device\n");
+                deleteDevice();
                 break;
             case '3':
-                puts("List all contacts\n");
-                listAll();
+                puts("List all bluetooth Devices\n");
+                listAllDevices();
                 break;
             case '4':
-                puts("Modify a contact\n");
-                modifyContact();
+                puts("Modify a bluetooth Device\n");
+                modifyDevice();
                 break;
             case '5':
-                puts("Find a contact by name\n");
-                findContact();
+                puts("Find a bluetooth Device by deviceName\n");
+                findDevice();
                 break;
             case 'Q':
                 puts("Save and quit\n");
@@ -126,16 +122,16 @@ int main() {
 
     /* Write each record to disk*/
     while (currentRecord != NULL) {
-        fwrite(currentRecord, sizeof(struct contact), 1, datafile);
+        fwrite(currentRecord, sizeof(struct bluetoothDevice), 1, datafile);
         currentRecord = currentRecord->next;
     }
     fclose(datafile);             /*closes data file*/
     return (0);
 }
 
-void addNewContact(void) /* add new contact function*/
+void addNewDevice(void) /* add new bluetooth Device function*/
 {
-    newRecord = (struct contact *) malloc(sizeof(struct contact));
+    newRecord = (struct bluetoothDevice *) malloc(sizeof(struct bluetoothDevice));
     /*allocates memory for new structure.*/
 
     /*
@@ -158,17 +154,12 @@ void addNewContact(void) /* add new contact function*/
 
     /* update the structure */
     currentRecordNumber++;
-    printf("%27s: %5i\n", "contact number", currentRecordNumber);
-    currentRecord->number = currentRecordNumber;    /*currentRecordNumber is used to give unique account numbers*/
+    printf("%27s: %5i\n", "bluetooth Device serial Number", currentRecordNumber);
+    currentRecord->serialNumber = currentRecordNumber;    /*currentRecordNumber is used to give unique account numbers*/
 
-    printf("%27s: ", "Enter contact name");
-    gets(currentRecord->name);
-    printf("%27s: ", "Enter contact Phone number");
-    gets(currentRecord->phone);
-    printf("%27s: ", "Enter contact email");
-    gets(currentRecord->email);
-    printf("contact added!");
-    currentRecord->count = 0;
+    printf("%27s: ", "Enter bluetooth Device deviceName");
+    gets(currentRecord->deviceName);
+    printf("bluetooth Device added!");
 
     /*
      * gives the new record a NULL pointer
@@ -177,109 +168,101 @@ void addNewContact(void) /* add new contact function*/
     currentRecord->next = NULL;
 }
 
-void listAll(void) /* list all contacts function*/
+void listAllDevices(void) /* list all contacts function*/
 {
     if (firstRecord == NULL)
-        puts("There are no contacts to display!"); /*prints message*/
+        puts("There are no devices to display!"); /*prints message*/
 
     else {
 
-        printf("%6s %-20s %-15s %-15s\n", "Acct#", "Name", "Phone", "Email");
+        printf("%6s %-20s\n", "#", "Device Name");
         puts("------ -------------------- ------------- -------------------");
         /*prints table titles*/
         currentRecord = firstRecord;
 
         do {
 
-            printf("%6d: %-20s %-15s %-20s\n", \
-                currentRecord->number, \
-                currentRecord->name, \
-                currentRecord->phone, \
-                currentRecord->email);
-            /*prints values of number, name, phone and email*/
+            printf("%6d: %-20s\n", \
+                currentRecord->serialNumber, \
+                currentRecord->deviceName);
+            /*prints values of serial Number, device Name*/
         } while ((currentRecord = currentRecord->next) != NULL);
     }
 }
 
-void deleteContact(void)     /*delete contact function */
+void deleteDevice(void)     /*delete bluetooth Device function */
 {
     int record;
-    struct contact *previousa;
+    struct bluetoothDevice *previousDevice;
 
     if (firstRecord == NULL) {
-        puts("There are no contacts to delete!");
+        puts("There are no devices to delete!");
         return;
     }
 
-    listAll();        /* show all records*/
-    printf("Enter contact account number to delete: ");
+    listAllDevices();        /* show all records*/
+    printf("Enter bluetooth Device serial Number to delete: ");
     scanf("%d", &record);
     currentRecord = firstRecord;
 
     while (currentRecord != NULL) {
 
-        if (currentRecord->number == record) {
+        if (currentRecord->serialNumber == record) {
 
             if (currentRecord == firstRecord)    /*if record to be deleted is the first record*/
                 firstRecord = currentRecord->next; /*reset firstRecord to point at next record as first*/
             else
-                previousa->next = currentRecord->next;/*previous pointer used if record*/
+                previousDevice->next = currentRecord->next;/*previous pointer used if record*/
 
             /*to delete is not the first*/
             free(currentRecord); /*frees memory <deletes>*/
-            printf("contact %d deleted!\n", record);
+            printf("bluetooth Device %d deleted!\n", record);
             return;
 
         } else {
 
-            previousa = currentRecord;
+            previousDevice = currentRecord;
             currentRecord = currentRecord->next;
         }
     }
-    printf("contact %d not found!\n", record);
+    printf("bluetooth Device %d not found!\n", record);
 }
 
-void modifyContact(void)   /*modify contact function*/
+void modifyDevice(void)   /*modify bluetooth Device function*/
 {
     int record, result;
 
     if (firstRecord == NULL) {
-        puts("There are no contacts to modify!");
+        puts("There are no devices to modify!");
         return;
     }
 
-    listAll();        /* show all records */
-    printf("Enter contact account number to modify or change: ");
+    listAllDevices();        /* show all records */
+    printf("Enter bluetooth Device serial Number to modify or change: ");
     scanf("%d", &record);  /*scan user input to record*/
-    result = findnum(record);
+    result = checkDevice(record);
 
     if (result > 0) {
 
-        printf("Contact %d:\n", currentRecord->number);
-        printf("Name: %s\n", currentRecord->name);
+        printf("Bluetooth Device %d:\n", currentRecord->serialNumber);
+        printf("Name: %s\n", currentRecord->deviceName);
 
         if (prompt())
-            gets(currentRecord->name);
-        printf("Phone: %s\n", currentRecord->phone);
-        if (prompt())
-            gets(currentRecord->phone);
-        printf("Email: %s\n", currentRecord->email);
-        if (prompt())
-            gets(currentRecord->email);
+            gets(currentRecord->deviceName);
         return;
     }
-    printf("contact %d was not found!\n", record);
+    printf("bluetooth Device %d was not found!\n", record);
 }
 
-int findnum(int recordnum) {
+int checkDevice(int recordNumber) {
 
     int record;
-    record = recordnum;
+    record = recordNumber;
     currentRecord = firstRecord;
 
     while (currentRecord != NULL) {
 
-        if (currentRecord->number == record) {
+        if (currentRecord->serialNumber == record) {
             return 1;
         } else {
             currentRecord = currentRecord->next;
@@ -288,16 +271,16 @@ int findnum(int recordnum) {
     return -1;
 }
 
-int findContact(void) /* find contact function*/
+int findDevice(void) /* find bluetooth Device function*/
 {
     char buff[20];
 
     if (firstRecord == NULL) {
-        puts("There are no contacts to find!");
+        puts("There are no devices to find!");
         return 1;
     }
 
-    printf("Enter contact name: ");
+    printf("Enter bluetooth Device deviceName: ");
     fflush(stdin);/*clears any text from the input stream*/
     gets(buff);
 
@@ -305,16 +288,14 @@ int findContact(void) /* find contact function*/
 
     while (currentRecord != NULL) {
 
-        if (strcmp(currentRecord->name, buff) == 0) {
+        if (strcmp(currentRecord->deviceName, buff) == 0) {
 
-            printf("%6s %-20s %-15s %-15s\n", "Acct#", "Name", "Phone", "Email");
+            printf("%6s %-20s\n", "#", "Device Name");
             /*prints table titles*/
-            printf("%6d: %-20s %-15s %-20s\n", \
-            currentRecord->number, \
-            currentRecord->name, \
-            currentRecord->phone, \
-            currentRecord->email);
-            /*prints values of number, name, phone and email*/
+            printf("%6d: %-20s\n", \
+            currentRecord->serialNumber, \
+            currentRecord->deviceName);
+            /*prints values of serial Number, device Name*/
             return 0;
 
         } else {
@@ -322,7 +303,7 @@ int findContact(void) /* find contact function*/
         }
     }
 
-    printf("contact %s was not found!\n", buff);
+    printf("bluetooth Device %s was not found!\n", buff);
     return 1;
 }
 
